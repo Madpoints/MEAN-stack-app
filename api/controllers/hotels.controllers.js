@@ -32,10 +32,10 @@ module.exports.hotelsGetOne = function(req, res) {
 
 	Hotel
 	.findById(hotelId)
-	.exec(function(err, doc) {
+	.exec(function(err, hotel) {
 			res
 				.status(200)
-				.json(doc);
+				.json(hotel);
 
 		});
 };
