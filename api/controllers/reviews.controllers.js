@@ -7,12 +7,23 @@ module.exports.reviewsGetAll = function(req, res) {
 	console.log("GET hotelId", hotelId);
 
 	Hotel
-	.findById(hotelId)
-	.select('reviews')
-	.exec(function(err, hotel) {
-		res
-			.status(200)
-			.json(hotel.reviews);
+		.findById(hotelId)
+		.select('reviews')
+		.exec(function(err, hotel) {
+			var response = {
+				status: 200,
+				message: hotel.reviews
+			};
+
+			if (err) {
+				console.log("Error finding reviews");
+				response.status = 500;
+				response.message = err;
+			} 
+				
+			res
+				.status(200)
+				.json(response.message);
 	});
 };
 
@@ -22,12 +33,28 @@ module.exports.reviewsGetOne = function(req, res) {
 	console.log("GET reviewId " + reviewId + " for hotelId " + hotelId);
 
 	Hotel
-	.findById(hotelId)
-	.select('reviews')
-	.exec(function(err, hotel) {
-		var review = hotel.reviews.id(reviewId)
-		res
-			.status(200)
-			.json(review);
+		.findById(hotelId)
+		.select('reviews')
+		.exec(function(err, hotel) {
+			var review = hotel.reviews.id(reviewId)
+			var response = {
+				status: 200,
+				message: review
+			};
+
+			if (err) {
+				console.log("Error finding review");
+				response.status = 500;
+				response.message = err;
+			} else if (!review) {
+				response.status = 404;
+				response.message = {
+					"message" : "Review ID not found"
+				};	
+			}
+			
+			res
+				.status(response.status)
+				.json(response.message);
 	});
 };
