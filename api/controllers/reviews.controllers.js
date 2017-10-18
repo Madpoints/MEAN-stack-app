@@ -116,3 +116,53 @@ module.exports.reviewsAddOne = function(req, res) {
 			}
 	});
 };
+
+module.exports.reviewsUpdateOne = function(req, res) {
+	var hotelId = req.params.hotelId;
+	var reviewId = req.params.reviewId;
+	console.log("GET reviewId " + reviewId + " for hotelId " + hotelId);
+
+	Hotel
+		.findById(hotelId)
+		.select('reviews')
+		.exec(function(err, hotel) {
+			var review = hotel.reviews.id(reviewId);
+			var response = {
+				status: 200,
+				message: review
+			};
+
+			if (err) {
+				console.log("Error finding hotel");
+				response.status = 500;
+				response.message = err;
+			} else if (!review) {
+				response.status = 404;
+				response.message = {
+					"message" : "Reviews not found"
+				};	
+			}
+
+			if (response.status !== 200){
+				res
+					.status(response.status)
+					.json(response.message);	
+			} else {
+				review.name = req.body.name;
+				review.rating = req.body.rating;
+				review.review = req.body.review;
+			}
+
+			hotel.save(function(err, reviewUpdated) {
+				if (err) {
+					res
+						.status(500)
+						.json(err);
+				} else {
+					res
+						.status(204)
+						.json();
+				}
+			});
+		});
+};

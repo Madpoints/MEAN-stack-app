@@ -179,3 +179,61 @@ module.exports.hotelsAddOne = function(req, res) {
 			}	
 		});
 };
+
+module.exports.hotelsUpdateOne = function(req, res) {
+	
+	var hotelId = req.params.hotelId;
+	console.log("GET hotelId", hotelId);
+
+	Hotel
+	.findById(hotelId)
+	.select("-reviews -rooms")
+	.exec(function(err, hotel) {
+		var response = {
+			status: 200,
+			message: hotel
+		};
+		if (err) {
+			console.log("Error finding hotel");
+			response.status = 500;
+			response.message = err;
+		} else if (!hotel) {
+			response.status = 404;
+			response.message = {
+				"message" : "Hotel ID not found"
+			};	
+		}
+
+		if (response.status !== 200){
+			res
+				.status(response.status)
+				.json(response.message);	
+		} else {
+			hotel.name = req.body.name;
+			hotel.description = req.body.description,
+			hotel.stars = parseInt(req.body.stars, 10),
+			hotel.services = _splitArray(req.body.services),
+			hotel.photos = _splitArray(req.body.photos),
+			hotel.currency = req.body.currency,
+			hotel.location = {
+				address: req.body.address,
+				coordinates: [
+					parseFloat(req.body.lat),
+					parseFloat(req.body.lng)
+				]
+			};
+
+			hotel.save(function(err, hotelUpdated) {
+				if (err) {
+					res
+						.status(500)
+						.json(err);
+				} else {
+					res
+						.status(204)
+						.json();
+				}
+			});
+		}
+	});	
+};
