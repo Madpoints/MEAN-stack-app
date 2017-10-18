@@ -47,10 +47,10 @@ var hotelSchema = new mongoose.Schema({
 	reviews: [reviewSchema],
 	rooms: [roomSchema],
 	location: {
-		adress: String,
+		address: String,
 		// always store coordinates long, lat
 		coordinates: {
-			type: Number,
+			type: [Number],
 			index: '2dsphere'
 		}
 	}
